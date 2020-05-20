@@ -309,25 +309,6 @@ npy__cpu_init_features_arm8(void)
 #define NPY__HWCAP_ASIMDDP  (1 << 20)
 #define NPY__HWCAP_ASIMDFHM (1 << 23)
 
-static void *memmem(void *start, unsigned int s_len, void *find,
-unsigned int f_len)
-{
-    char *p, *q;
-    unsigned int len;
-    p = start, q = find;
-    len = 0;
-    while((p - (char *)start + f_len) <= s_len){
-        while(*p++ == *q++){
-            len++;
-            if(len == f_len)
-                return(p - f_len);
-        };
-        q = find;
-        len = 0;
-    };
-    return(NULL);
-}
-
 /* Get the size of a file by reading it until the end. This is needed
  * because files under /proc do not always return a valid size when
  * using fseek(0, SEEK_END) + ftell(). Nor can they be mmap()-ed.
