@@ -321,12 +321,12 @@ static void get_feature_from_proc_cpuinfo() {
     }
     cpuinfo_len = read_file("/proc/cpuinfo", cpuinfo, cpuinfo_len);
     char* cpuArch = extract_cpuinfo_field(cpuinfo, cpuinfo_len, "CPU architecture");
-    boolean isV8 = false;
+    int isV8 = 0;
     if (cpuArch) {
         architecture = strtol(cpuArch, NULL, 10);
         free(cpuArch);
         if (architecture >= 8L) {
-            isV8 = true;
+            isV8 = 1;
             npy__cpu_init_features_arm8();
         }
     }

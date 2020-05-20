@@ -1,3 +1,5 @@
+#ifndef _FILESYSTEM_H_
+#define _FILESYSTEM_H_
 
 static int
 get_file_size(const char* pathname);
@@ -7,3 +9,5 @@ static char*
 extract_cpuinfo_field(const char* buffer, int buflen, const char* field);
 static int
 has_list_item(const char* list, const char* item);
+
+#endif
