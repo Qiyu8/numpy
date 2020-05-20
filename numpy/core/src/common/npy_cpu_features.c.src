@@ -284,6 +284,7 @@ npy__cpu_init_features_arm8(void)
 */
 #include <stdio.h>
 #include <fcntl.h>
+#include "filesystem.h"
 
 #define NPY__HWCAP  16
 #define NPY__HWCAP2 26
@@ -306,10 +307,49 @@ npy__cpu_init_features_arm8(void)
 #define NPY__HWCAP_ASIMDDP  (1 << 20)
 #define NPY__HWCAP_ASIMDFHM (1 << 23)
 
+static void get_feature_from_proc_cpuinfo() {
+    char* cpuinfo = NULL;
+    int   cpuinfo_len;
+    long architecture = 0;
+    cpuinfo_len = get_file_size("/proc/cpuinfo");
+    if (cpuinfo_len < 0) {
+      return;
+    }
+    cpuinfo = malloc(cpuinfo_len);
+    if (cpuinfo == NULL) {
+      return;
+    }
+    cpuinfo_len = read_file("/proc/cpuinfo", cpuinfo, cpuinfo_len);
+    char* cpuArch = extract_cpuinfo_field(cpuinfo, cpuinfo_len, "CPU architecture");
+    boolean isV8 = false;
+    if (cpuArch) {
+        architecture = strtol(cpuArch, NULL, 10);
+        free(cpuArch);
+        if (architecture >= 8L) {
+            isV8 = true;
+            npy__cpu_init_features_arm8();
+        }
+    }
+    char* cpuFeatures = extract_cpuinfo_field(cpuinfo, cpuinfo_len, "Features");
+    if (cpuFeatures != NULL) {
+        npy__cpu_have[NPY_CPU_FEATURE_FPHP]       = has_list_item(cpuFeatures, "fphp");
+        npy__cpu_have[NPY_CPU_FEATURE_ASIMDHP]    = has_list_item(cpuFeatures, "asimdhp");
+        npy__cpu_have[NPY_CPU_FEATURE_ASIMDDP]    = has_list_item(cpuFeatures, "asimddp");
+        npy__cpu_have[NPY_CPU_FEATURE_ASIMDFHM]   = has_list_item(cpuFeatures, "asimdfhm");
+        npy__cpu_have[NPY_CPU_FEATURE_NEON]       = has_list_item(cpuFeatures, "neon") || has_list_item(cpuFeatures, "asimd");
+        npy__cpu_have[NPY_CPU_FEATURE_NEON_FP16]  = isV8 || has_list_item(cpuFeatures, "fp");
+        npy__cpu_have[NPY_CPU_FEATURE_NEON_VFPV4] = isV8 || has_list_item(cpuFeatures, "vfpv4");
+    }
+}
+
 __attribute__((weak)) unsigned long getauxval(unsigned long); // linker should handle it
 static int
 npy__cpu_init_features_linux(void)
 {
+    // capabilities are fetched from both getauxval and /proc/cpuinfo so we can
+    // have some information if the executable is sandboxed (aka no access to
+    // /proc/cpuinfo).
+    get_feature_from_proc_cpuinfo();
     unsigned long hwcap = 0, hwcap2 = 0;
     if (getauxval != 0) {
         hwcap = getauxval(NPY__HWCAP);
@@ -336,13 +376,6 @@ npy__cpu_init_features_linux(void)
             }
             close(fd);
         }
-    }
-    if (hwcap == 0 && hwcap2 == 0) {
-        /*
-         * FIXME: failback to compiler definitions,
-         * BTW we can parse /proc/cpuinfo for badly patched kernels
-        */
-        return 0;
     }
 #ifdef __arm__
     // Detect Arm8 (aarch32 state)
