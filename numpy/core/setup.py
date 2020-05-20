@@ -724,6 +724,7 @@ def configuration(parent_package='',top_path=None):
             join('src', 'common', 'cblasfuncs.h'),
             join('src', 'common', 'lowlevel_strided_loops.h'),
             join('src', 'common', 'mem_overlap.h'),
+            join('src', 'common', 'filesystem.h'),
             join('src', 'common', 'npy_cblas.h'),
             join('src', 'common', 'npy_config.h'),
             join('src', 'common', 'npy_ctypes.h'),
@@ -740,6 +741,7 @@ def configuration(parent_package='',top_path=None):
     common_src = [
             join('src', 'common', 'array_assign.c'),
             join('src', 'common', 'mem_overlap.c'),
+            join('src', 'common', 'filesystem.c'),
             join('src', 'common', 'npy_longdouble.c'),
             join('src', 'common', 'templ_common.h.src'),
             join('src', 'common', 'ucsnarrow.c'),
