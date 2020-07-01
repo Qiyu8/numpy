@@ -4122,6 +4122,9 @@ static struct PyMethodDef array_module_methods[] = {
     {"test_interrupt",
         (PyCFunction)test_interrupt,
         METH_VARARGS, NULL},
+    {"test_dispatch",
+        (PyCFunction)Compiled_base_test_dispatch,
+        METH_VARARGS, NULL},
     {"_insert", (PyCFunction)arr_insert,
         METH_VARARGS | METH_KEYWORDS,
         "Insert vals sequentially into equivalent 1-d positions "

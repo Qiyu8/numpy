@@ -2020,3 +2020,56 @@ io_unpack(PyObject *NPY_UNUSED(self), PyObject *args, PyObject *kwds)
     }
     return unpack_bits(obj, axis, count, c[0]);
 }
+
+// Testing the utilites of the CPU dispatcher
+#ifndef NPY_DISABLE_OPTIMIZATION
+    #include "compiled_base.dispatch.h"
+#endif
+NPY_CPU_DISPATCH_DECLARE(extern const char *compiled_base_dispatch_var)
+NPY_CPU_DISPATCH_DECLARE(const char *compiled_base_dispatch_func, (void))
+NPY_CPU_DISPATCH_DECLARE(void compiled_base_dispatch_attach, (PyObject *list))
+
+NPY_NO_EXPORT PyObject *
+Compiled_base_test_dispatch(PyObject *NPY_UNUSED(dummy), PyObject *NPY_UNUSED(dummy2))
+{
+    const char *highest_func, *highest_var;
+    NPY_CPU_DISPATCH_CALL(highest_func = compiled_base_dispatch_func, ())
+    NPY_CPU_DISPATCH_CALL(highest_var  = compiled_base_dispatch_var)
+    const char *highest_func_xb = "nobase", *highest_var_xb = "nobase";
+    NPY_CPU_DISPATCH_CALL_XB(highest_func_xb = compiled_base_dispatch_func, ())
+    NPY_CPU_DISPATCH_CALL_XB(highest_var_xb  = compiled_base_dispatch_var)
+
+    PyObject *dict = PyDict_New(), *item;
+    if (dict == NULL) {
+        return NULL;
+    }
+    item = PyUnicode_FromString(highest_func);
+    if (item == NULL || PyDict_SetItemString(dict, "func", item) < 0) {
+        goto err;
+    }
+    item = PyUnicode_FromString(highest_var);
+    if (item == NULL || PyDict_SetItemString(dict, "var", item) < 0) {
+        goto err;
+    }
+    item = PyUnicode_FromString(highest_func_xb);
+    if (item == NULL || PyDict_SetItemString(dict, "func_xb", item) < 0) {
+        goto err;
+    }
+    item = PyUnicode_FromString(highest_var_xb);
+    if (item == NULL || PyDict_SetItemString(dict, "var_xb", item) < 0) {
+        goto err;
+    }
+    item = PyList_New(0);
+    if (item == NULL || PyDict_SetItemString(dict, "all", item) < 0) {
+        goto err;
+    }
+    NPY_CPU_DISPATCH_CALL_ALL(compiled_base_dispatch_attach, (item))
+    if (PyErr_Occurred()) {
+        goto err;
+    }
+    return dict;
+err:
+    Py_XDECREF(item);
+    Py_DECREF(dict);
+    return NULL;
+}
