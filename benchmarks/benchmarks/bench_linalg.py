@@ -116,7 +116,7 @@ class Einsum(Benchmark):
         self.two_dim_small = np.arange(1200, dtype=dtype).reshape(30, 40)
         self.two_dim = np.arange(240000, dtype=dtype).reshape(400, 600)
         self.three_dim_small = np.arange(10000, dtype=dtype).reshape(10,100,10)
-        self.three_dim = np.arange(24000, dtype=dtype).reshape(20, 30, 40)
+        self.three_dim = np.arange(240000, dtype=dtype).reshape(200, 30, 40)
         # non_contigous arrays
         self.non_contigous_dim1_small = np.arange(1, 80, 2, dtype=dtype)
         self.non_contigous_dim1 = np.arange(1, 4000, 2, dtype=dtype)
