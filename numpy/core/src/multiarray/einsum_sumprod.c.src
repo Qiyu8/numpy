@@ -300,6 +300,7 @@ static void
      */
     @cond@ {
         const npy_intp vstepx4 = vstep * 4;
+        printf("count:%d, NPY_SIMD:%d\n",count,NPY_SIMD);
         for (; count >= vstepx4; count -= vstepx4, data0 += vstepx4, data1 += vstepx4, data_out += vstepx4) {
             /**begin repeat3
              * #i = 0, 1, 2, 3#
