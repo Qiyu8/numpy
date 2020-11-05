@@ -299,7 +299,6 @@ static void
      * #st = storea, store#
      */
     @cond@ {
-    #if @unroll_by@ == 4
         const npy_intp vstepx4 = vstep * 4;
         for (; count >= vstepx4; count -= vstepx4, data0 += vstepx4, data1 += vstepx4, data_out += vstepx4) {
             /**begin repeat3
@@ -320,23 +319,6 @@ static void
             npyv_@st@_@sfx@(data_out + vstep * @i@, abc@i@);
             /**end repeat3**/
         }
-    #elif @unroll_by@ == 2
-        const npy_intp vstepx2 = vstep * 2;
-        for (; count >= vstepx2; count -= vstepx2, data0 += vstepx2, data1 += vstepx2, data_out += vstepx2) {
-            npyv_@sfx@ a0 = npyv_@ld@_@sfx@(data0);
-            npyv_@sfx@ a1 = npyv_@ld@_@sfx@(data0 + vstep);
-            npyv_@sfx@ b0 = npyv_@ld@_@sfx@(data1);
-            npyv_@sfx@ b1 = npyv_@ld@_@sfx@(data1 + vstep);
-            npyv_@sfx@ c0 = npyv_@ld@_@sfx@(data_out);
-            npyv_@sfx@ c1 = npyv_@ld@_@sfx@(data_out + vstep);
-            npyv_@sfx@ abc0 = npyv_muladd_@sfx@(a0, b0, c0);
-            npyv_@sfx@ abc1 = npyv_muladd_@sfx@(a1, b1, c1);
-            npyv_@st@_@sfx@(data_out, abc0);
-            npyv_@st@_@sfx@(data_out + vstep, abc1);
-        }
-    #else
-        #error "Invalid unroll_by = @unroll_by@"
-    #endif
     }
     /**end repeat2**/
     npyv_cleanup();
