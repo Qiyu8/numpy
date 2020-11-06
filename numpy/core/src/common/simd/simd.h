@@ -15,6 +15,7 @@
 extern "C" {
 #endif
 #ifndef NPY_HAVE_AVX2
+    #include <immintrin.h>
     #define NPY_HAVE_AVX
     #define NPY_HAVE_AVX2
 #endif
