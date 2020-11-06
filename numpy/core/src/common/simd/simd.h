@@ -14,7 +14,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#ifndef NPY_HAVE_AVX2
+    #define NPY_HAVE_AVX2
+#endif
 // lane type by intrin suffix
 typedef npy_uint8  npyv_lanetype_u8;
 typedef npy_int8   npyv_lanetype_s8;
