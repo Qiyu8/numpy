@@ -97,7 +97,14 @@ class TestEinsum:
             # Check order kwarg, asanyarray allows 1d to pass through
             assert_raises(ValueError, np.einsum, "i->i", np.arange(6).reshape(-1, 1),
                           optimize=do_opt, order='d')
-
+    def test_einsum_xyz(self):
+        import time
+        self.two_dim_small = np.arange(3000*4000, dtype=np.float32).reshape(3000, 4000)
+        self.three_dim = np.arange(20*3000*4000, dtype=np.float32).reshape(20, 3000, 4000)
+        t1 = time.perf_counter()
+        np.einsum("..., ...", self.two_dim_small, self.three_dim , optimize=True)
+        print((time.perf_counter()-t1)*1000+"ms")
+        
     def test_einsum_views(self):
         # pass-through
         for do_opt in [True, False]:

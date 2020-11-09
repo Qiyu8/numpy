@@ -1,0 +1,1 @@
+python runtests.py -v -t numpy/core/tests/test_einsum.py::TestEinsum::test_einsum_xyz -- -s

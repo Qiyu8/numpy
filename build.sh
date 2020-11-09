@@ -1,0 +1,1 @@
+python setup.py build_ext --cpu-baseline="avx2" --cpu-dispatch="none"

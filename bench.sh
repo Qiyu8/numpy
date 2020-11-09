@@ -1,0 +1,2 @@
+python runtests.py --cpu-baseline="avx2" --cpu-dispatch="none" --bench-compare test_asv bench_linalg.Einsum.time_einsum_multiply
+#python runtests.py --cpu-baseline="sse2" --cpu-dispatch="none" --bench bench_linalg.Einsum.time_einsum_multiply
