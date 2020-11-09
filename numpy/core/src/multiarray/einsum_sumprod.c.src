@@ -299,6 +299,7 @@ static void
      * #st = storea, store#
      */
     @cond@ {
+        printf("NPY_SIMD:%d\n", NPY_SIMD);
         const npy_intp vstepx4 = vstep * 4;
         for (; count >= vstepx4; count -= vstepx4, data0 += vstepx4, data1 += vstepx4, data_out += vstepx4) {
             /**begin repeat3
