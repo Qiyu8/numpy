@@ -211,6 +211,41 @@ subpackage will have that subpackage already imported. E.g. for a test
 in ``numpy/linalg/tests/``, the namespace will be created such that
 ``from numpy import linalg`` has already executed.
 
+Universal intrinsics tests
+--------
+
+Universal intrinsics are special code that used to accelerate through
+data parallelization, if you added new intrinsic api in numpy/core/src/common/simd,
+you should add a corresponding unit test by follow the procedure below::
+1.Add new methods for the new intrinsics within _simd.dispatch.c.src, for example, if
+you added two reduce sum api::
+
+  ...
+  // try to follow the current defentions in the way of sorting the source
+  // this how you should define the new python methods
+  SIMD_IMPL_INTRIN_1(sum_f32, f32, vf32)
+  #if NPY_SIMD_F64
+  SIMD_IMPL_INTRIN_1(sum_f64, f64, vf64)
+  #endif
+  // and that how we attach them
+  SIMD_INTRIN_DEF(sum_f32)
+  #if NPY_SIMD_F64
+  SIMD_INTRIN_DEF(sum_f64)
+  #endif
+  ...
+
+2.Once you get done bringing the new methods to _simd module, go to test_simd.py
+and add testing cases for them. for example::
+
+  ...
+  def test_reduce_sum(self):
+      data = self._data()
+      vdata = self.load(data)
+      # reduce sum
+      data_sum = sum(data)
+      vsum = self.sum(vdata)
+      assert vsum == data_sum
+  ...
 
 ``tests/``
 ----------

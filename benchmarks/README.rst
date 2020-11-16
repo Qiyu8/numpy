@@ -52,6 +52,23 @@ Compare change in benchmark results to another version/commit/branch::
     python runtests.py --bench-compare 8bf4e9b bench_core
     python runtests.py --bench-compare master bench_core
 
+Benchmarking performance improvements of universal intrinsics changes::
+
+    python runtests.py --cpu-baseline="avx2" --bench-compare master bench_core
+    python runtests.py --cpu-dispatch="avx512f" --bench-compare master bench_core
+    python runtests.py --cpu-baseline="avx2" --cpu-dispatch="avx512f" --bench-compare master bench_core
+
+.. note::
+
+   The default baseline settings --cpu-baseline is "min", which represents the minimal set of required optimizations,
+   for example, on x64, the minimal optimization set is ['SSE', 'SSE2', 'SSE3'].
+   PyExc_RuntimeError will be raised if the running machine does not support any of them.
+   if you want to disable SIMD optimization, just need to set --cpu-baseline="none".
+   --cpu-dispatch specifies the dispatched set of additional optimizations that supported by
+   the compiler and platform, the default value is "max", for example, on x86_64 the maximum optimization set
+   is ['SSSE3', 'SSE41', 'POPCNT', 'SSE42', 'AVX', 'F16C', 'FMA3', 'AVX2', 'AVX512F'].
+   if you want to disable dispatched optimizations, just need to set --cpu-dispatch="none".
+
 All of the commands above display the results in plain text in
 the console, and the results are not saved for comparison with
 future commits. For greater control, a graphical view, and to
